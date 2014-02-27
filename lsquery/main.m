@@ -1,26 +1,36 @@
 #import <Foundation/Foundation.h>
 #import "NSBundleAdditions.h"
 
+extern OSStatus _LSCopyAllApplicationURLs(CFArrayRef *urls) __attribute__((weak_import));
+
+/**
+ * Returns an array of NSBundles for every application in the Launch Services database with the
+ * given bundle identifier.
+ *
+ * Launch Services does not appear to have any API that can perform this search. Instead
+ * the private _LSCopyAllApplicationURLs() is used to obtain the URLs of every application on
+ * the system and they are searched for matching bundles. This is inefficient but preferable
+ * to using another system like Spotlight to obtain this list, as Launch Services may be aware
+ * of bundles that Spotlight is not.
+ */
 static NSArray *BundlesForBundleIdentifier(NSString *bundleIdentifier) {
+    CFArrayRef urlRefs;
     NSMutableArray *bundles = [NSMutableArray array];
 
-    NSString *queryString = [NSString stringWithFormat:@"kMDItemCFBundleIdentifier == '%@'c", bundleIdentifier];
+    if (_LSCopyAllApplicationURLs == NULL || _LSCopyAllApplicationURLs(&urlRefs) != 0) {
+        return nil;
+    }
 
-    MDQueryRef query = MDQueryCreate(kCFAllocatorDefault, (__bridge CFStringRef)queryString, NULL, NULL);
-    MDQueryExecute(query, kMDQuerySynchronous);
-    MDQueryStop(query);
-
-    CFIndex count = MDQueryGetResultCount(query);
-    for (CFIndex i = 0; i < count; i++) {
-        MDItemRef item = (MDItemRef)MDQueryGetResultAtIndex(query, i);
-        NSString *path = CFBridgingRelease(MDItemCopyAttribute(item, kMDItemPath));
-        NSBundle *bundle = [NSBundle bundleWithPath:path];
+    for (NSURL *url in (__bridge NSArray *)urlRefs) {
+        NSBundle *bundle = [NSBundle bundleWithURL:url];
         if (bundle != nil) {
-            [bundles addObject:bundle];
+            if ([[bundle bundleIdentifier] isEqualToString:bundleIdentifier]) {
+                [bundles addObject:bundle];
+            }
         }
     }
 
-    CFRelease(query);
+    CFRelease(urlRefs);
 
     return bundles;
 }
@@ -28,13 +38,6 @@ static NSArray *BundlesForBundleIdentifier(NSString *bundleIdentifier) {
 static void print_usage(void) {
     printf("Usage: lsquery <bundle identifier>\n");
 }
-
-/**
- * This utility does not detect all conflicts. Launch Services does not expose an API to obtain the location of all
- * applications for a given bundle identifier, so Spotlight is used for this purpose. Further, not all data in a
- * CFBundleVersion is necessarily used by Launch Services as part of the version, so it is possible that two bundles
- * with different CFBundleVersion strings could have the same Launch Services version.
- */
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
@@ -58,6 +61,11 @@ int main(int argc, const char * argv[]) {
         NSString *resultVersion = [resultBundle ms_bundleVersion];
 
         NSArray *bundles = BundlesForBundleIdentifier(bundleIdentifier);
+        if (bundles == nil) {
+            printf("Unable to query matching applications from Launch Services.\n");
+            return 1;
+        }
+
         bundles = [bundles sortedArrayUsingComparator:^NSComparisonResult(NSBundle *bundle1, NSBundle *bundle2) {
             NSString *version1 = [bundle1 ms_bundleVersion];
             NSString *version2 = [bundle2 ms_bundleVersion];
