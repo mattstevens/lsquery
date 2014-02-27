@@ -23,8 +23,8 @@ static NSArray *BundlesForBundleIdentifier(NSString *bundleIdentifier) {
 
     for (NSURL *url in (__bridge NSArray *)urlRefs) {
         NSBundle *bundle = [NSBundle bundleWithURL:url];
-        if (bundle != nil) {
-            if ([[bundle bundleIdentifier] isEqualToString:bundleIdentifier]) {
+        if (bundle != nil && [bundle bundleIdentifier] != nil) {
+            if ([[bundle bundleIdentifier] caseInsensitiveCompare:bundleIdentifier] == NSOrderedSame) {
                 [bundles addObject:bundle];
             }
         }
