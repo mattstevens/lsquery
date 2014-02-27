@@ -61,7 +61,11 @@ int main(int argc, const char * argv[]) {
         bundles = [bundles sortedArrayUsingComparator:^NSComparisonResult(NSBundle *bundle1, NSBundle *bundle2) {
             NSString *version1 = [bundle1 ms_bundleVersion];
             NSString *version2 = [bundle2 ms_bundleVersion];
-            return [version2 compare:version1 options:NSNumericSearch];
+            NSComparisonResult result = [version2 compare:version1 options:NSNumericSearch];
+            if (result == NSOrderedSame) {
+                result = [[bundle1 bundlePath] compare:[bundle2 bundlePath]];
+            }
+            return result;
         }];
 
         int versionLength = 0;
