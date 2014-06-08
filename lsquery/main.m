@@ -2,24 +2,30 @@
 #import <getopt.h>
 
 extern OSStatus _LSCopyAllApplicationURLs(CFArrayRef *urls) __attribute__((weak_import));
-
-extern uint64_t _LSGetVersionFromString(CFStringRef versionString);
+extern uint64_t _LSGetVersionFromString(CFStringRef versionString) __attribute__((weak_import));
+extern CFStringRef _LSVersionNumberCopyStringRepresentation(uint64_t version) __attribute__((weak_import));
 
 /**
  * Returns an array of NSBundles for every application in the Launch Services database with the
  * given bundle identifier.
  *
- * Launch Services does not appear to have any API that can perform this search. Instead
+ * Prior to OS X 10.10 Launch Services did not have an API to perform this search. On these systems
  * the private _LSCopyAllApplicationURLs() is used to obtain the URLs of every application on
  * the system and they are searched for matching bundles. This is inefficient but preferable
  * to using another system like Spotlight to obtain this list, as Launch Services may be aware
  * of bundles that Spotlight is not.
  */
 static NSArray *BundlesForBundleIdentifier(NSString *bundleIdentifier) {
-    CFArrayRef urlRefs;
+    CFArrayRef urlRefs = NULL;
     NSMutableSet *bundles = [NSMutableSet set];
 
-    if (_LSCopyAllApplicationURLs == NULL || _LSCopyAllApplicationURLs(&urlRefs) != 0) {
+    if (LSCopyApplicationURLsForBundleIdentifier != NULL) {
+        urlRefs = LSCopyApplicationURLsForBundleIdentifier((__bridge CFStringRef)bundleIdentifier, NULL);
+    } else if (_LSCopyAllApplicationURLs != NULL) {
+        _LSCopyAllApplicationURLs(&urlRefs);
+    }
+
+    if (urlRefs == NULL) {
         return nil;
     }
 
@@ -77,7 +83,13 @@ static NSArray *BundlesForURL(NSURL *url) {
 static NSBundle *BundleForURL(NSURL *url) {
     NSBundle *bundle = nil;
     CFURLRef urlRef = NULL;
-    LSGetApplicationForURL((__bridge CFURLRef)url, kLSRolesAll, NULL, &urlRef);
+
+    if (LSCopyDefaultApplicationURLForURL != NULL) {
+        urlRef = LSCopyDefaultApplicationURLForURL((__bridge CFURLRef)url, kLSRolesAll, NULL);
+    } else {
+        LSGetApplicationForURL((__bridge CFURLRef)url, kLSRolesAll, NULL, &urlRef);
+    }
+
     if (urlRef != NULL) {
         bundle = [NSBundle bundleWithURL:(__bridge NSURL *)urlRef];
         CFRelease(urlRef);
@@ -101,6 +113,10 @@ static uint64_t VersionForBundle(NSBundle *bundle) {
  * Returns a string representation of the specified Launch Services version number.
  */
 static NSString *StringForVersion(uint64_t version) {
+    if (_LSVersionNumberCopyStringRepresentation != NULL) {
+        return CFBridgingRelease(_LSVersionNumberCopyStringRepresentation(version));
+    }
+
     uint64_t major = version / 1000000;
     version -= major * 1000000;
 
