@@ -10,7 +10,6 @@
 		C941912A18BBEEA20071239E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C941912918BBEEA20071239E /* Foundation.framework */; };
 		C941912D18BBEEA20071239E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C941912C18BBEEA20071239E /* main.m */; };
 		C941913818BBEF960071239E /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C941913718BBEF960071239E /* CoreServices.framework */; };
-		C941913E18BC64E50071239E /* NSBundleAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C941913D18BC64E50071239E /* NSBundleAdditions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,8 +29,6 @@
 		C941912918BBEEA20071239E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C941912C18BBEEA20071239E /* main.m */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		C941913718BBEF960071239E /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
-		C941913C18BC64E50071239E /* NSBundleAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSBundleAdditions.h; sourceTree = "<group>"; };
-		C941913D18BC64E50071239E /* NSBundleAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSBundleAdditions.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,8 +74,6 @@
 			isa = PBXGroup;
 			children = (
 				C941912C18BBEEA20071239E /* main.m */,
-				C941913C18BC64E50071239E /* NSBundleAdditions.h */,
-				C941913D18BC64E50071239E /* NSBundleAdditions.m */,
 			);
 			path = lsquery;
 			sourceTree = "<group>";
@@ -134,7 +129,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C941913E18BC64E50071239E /* NSBundleAdditions.m in Sources */,
 				C941912D18BBEEA20071239E /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -245,6 +239,7 @@
 				C941913618BBEEA20071239E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
