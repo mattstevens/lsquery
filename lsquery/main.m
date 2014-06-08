@@ -15,7 +15,7 @@ extern OSStatus _LSCopyAllApplicationURLs(CFArrayRef *urls) __attribute__((weak_
  */
 static NSArray *BundlesForBundleIdentifier(NSString *bundleIdentifier) {
     CFArrayRef urlRefs;
-    NSMutableArray *bundles = [NSMutableArray array];
+    NSMutableSet *bundles = [NSMutableSet set];
 
     if (_LSCopyAllApplicationURLs == NULL || _LSCopyAllApplicationURLs(&urlRefs) != 0) {
         return nil;
@@ -32,7 +32,7 @@ static NSArray *BundlesForBundleIdentifier(NSString *bundleIdentifier) {
 
     CFRelease(urlRefs);
 
-    return bundles;
+    return [bundles allObjects];
 }
 
 static void print_usage(void) {
