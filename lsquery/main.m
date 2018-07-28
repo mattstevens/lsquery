@@ -230,7 +230,7 @@ static void print_usage() {
     "  -h, --help                 Show this help message and exit\n"
     "  -b, --bundleid <bundleid>  Search for the given bundle identifier\n"
     "  -u, --url <url>            Search for handlers of the given URL\n"
-    "      --find-all             Show all matching bundles\n"
+    "  -a  --find-all             Show all matching bundles\n"
     "      --version              Show the version and exit \n");
 }
 
@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
             { NULL,              0,                  NULL,               0  }
         };
 
-        while ((optchar = getopt_long(argc, argv, "hb:u:", longopts, NULL)) != -1) {
+        while ((optchar = getopt_long(argc, argv, "hb:u:a", longopts, NULL)) != -1) {
             switch (optchar) {
                 case 'h':
                     print_usage();
