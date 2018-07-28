@@ -246,6 +246,7 @@ int main(int argc, char *argv[]) {
             { "bundleid",        required_argument,  NULL,              'b' },
             { "url",             required_argument,  NULL,              'u' },
             { "find-all",        no_argument,        NULL,              'a' },
+            { "version",         no_argument,        NULL,              'v' },
             { NULL,              0,                  NULL,               0  }
         };
 
@@ -267,6 +268,9 @@ int main(int argc, char *argv[]) {
                 case 'a':
                     findAll = YES;
                     break;
+                case 'v':
+                    printf("lsquery 0.1\n");
+                    return 0;
                 case '?':
                     return 1;
                 default:
