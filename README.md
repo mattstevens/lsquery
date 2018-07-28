@@ -1,4 +1,4 @@
-#lsquery
+# lsquery
 
 A command line tool to query the Launch Services database on your Mac.
 
